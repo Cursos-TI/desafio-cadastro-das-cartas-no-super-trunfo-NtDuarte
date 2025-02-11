@@ -1,0 +1,57 @@
+#include <stdio.h>
+
+// Estrutura para armazenar os dados de uma cidade
+struct Cidade {
+    char codigo[4];  // Código da carta (ex: A01, B02)
+    char nome[50];   // Nome da cidade
+    int populacao;   // População da cidade
+    float area;      // Área em km²
+    float pib;       // PIB em bilhões
+    int pontos_turisticos; // Número de pontos turísticos
+};
+
+int main() {
+    int n;
+    printf("Quantas cidades deseja cadastrar? ");
+    scanf("%d", &n);
+    getchar();  // Consumir a quebra de linha
+
+    struct Cidade cidades[n];
+
+    // Cadastro das cidades
+    for (int i = 0; i < n; i++) {
+        printf("\nCadastro da cidade %d:\n", i + 1);
+        printf("Código (Ex: A01): ");
+        scanf("%3s", cidades[i].codigo);
+        getchar();  // Consumir a quebra de linha
+        
+        printf("Nome da cidade: ");
+        fgets(cidades[i].nome, 50, stdin);
+        
+        printf("População: ");
+        scanf("%d", &cidades[i].populacao);
+        
+        printf("Área (km²): ");
+        scanf("%f", &cidades[i].area);
+        
+        printf("PIB (bilhões): ");
+        scanf("%f", &cidades[i].pib);
+        
+        printf("Número de pontos turísticos: ");
+        scanf("%d", &cidades[i].pontos_turisticos);
+        getchar();  // Consumir a quebra de linha
+    }
+
+    // Exibição dos dados cadastrados
+    printf("\nCartas cadastradas:\n");
+    for (int i = 0; i < n; i++) {
+        printf("\nCódigo: %s\n", cidades[i].codigo);
+        printf("Nome: %s", cidades[i].nome);
+        printf("População: %d\n", cidades[i].populacao);
+        printf("Área: %.2f km²\n", cidades[i].area);
+        printf("PIB: %.2f bilhões\n", cidades[i].pib);
+        printf("Pontos turísticos: %d\n", cidades[i].pontos_turisticos);
+    }
+
+    return 0;
+}
