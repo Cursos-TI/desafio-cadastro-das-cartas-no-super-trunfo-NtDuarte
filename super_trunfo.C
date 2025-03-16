@@ -143,14 +143,61 @@ void cadastrarCarta(Carta *carta) {
 
 void listarCartas(Carta *cartas, int totalCartas) {
     printf("\nListando cartas cadastradas:\n");
-    for (int i = 0; i < totalCartas; i++) {
-        printf("%d - Código: %s, Cidade: %s, Estado: %c\n", i + 1, cartas[i].codigo, cartas[i].nomeCidade, cartas[i].estado);
+    if (totalCartas == 0) {
+        printf("Nenhuma carta cadastrada.\n");
+    } else {
+        for (int i = 0; i < totalCartas; i++) {
+            printf("%d - Código: %s, Cidade: %s, Estado: %c\n", i + 1, cartas[i].codigo, cartas[i].nomeCidade, cartas[i].estado);
+        }
     }
+}
+
+// Função para salvar as cartas em um arquivo
+void salvarCartasEmArquivo(Carta *cartas, int totalCartas) {
+    FILE *arquivo = fopen("cartas.txt", "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para salvar!\n");
+        return;
+    }
+
+    for (int i = 0; i < totalCartas; i++) {
+        fprintf(arquivo, "%s,%s,%c,%d,%.2f,%.2f,%d\n", 
+                cartas[i].codigo, cartas[i].nomeCidade, cartas[i].estado, 
+                cartas[i].populacao, cartas[i].area, cartas[i].pib, 
+                cartas[i].pontosTuristicos);
+    }
+
+    fclose(arquivo);
+    printf("Cartas salvas com sucesso no arquivo 'cartas.txt'!\n");
+}
+
+// Função para carregar as cartas a partir do arquivo
+int carregarCartasDeArquivo(Carta *cartas) {
+    FILE *arquivo = fopen("cartas.txt", "r");
+    int totalCartas = 0;
+
+    if (arquivo == NULL) {
+        printf("Nenhum arquivo de cartas encontrado. Criando um novo arquivo.\n");
+        return 0; // Nenhuma carta carregada
+    }
+
+    while (fscanf(arquivo, "%3s,%49[^,],%c,%d,%f,%f,%d\n", 
+                  cartas[totalCartas].codigo, cartas[totalCartas].nomeCidade, 
+                  &cartas[totalCartas].estado, &cartas[totalCartas].populacao, 
+                  &cartas[totalCartas].area, &cartas[totalCartas].pib, 
+                  &cartas[totalCartas].pontosTuristicos) == 7) {
+        totalCartas++;
+        if (totalCartas >= MAX_CARTAS) break;
+    }
+
+    fclose(arquivo);
+    return totalCartas;
 }
 
 int main() {
     Carta cartas[MAX_CARTAS];
-    int totalCartas = 0;
+    int totalCartas = carregarCartasDeArquivo(cartas); // Carregar cartas ao iniciar
     int opcao;
 
     do {
@@ -181,6 +228,7 @@ int main() {
                 }
                 break;
             case 4:
+                salvarCartasEmArquivo(cartas, totalCartas); // Salva as cartas no arquivo antes de sair
                 printf("Salvando e saindo...\n");
                 break;
             default:
