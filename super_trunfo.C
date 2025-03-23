@@ -98,33 +98,54 @@ int carregarCartasDeArquivo(Carta *cartas) {
     return totalCartas;
 }
 
-void compararCartas(Carta carta1, Carta carta2) {
-    int pontos1 = 0, pontos2 = 0;
-
-    if (carta1.populacao > carta2.populacao) pontos1++;
-    else if (carta1.populacao < carta2.populacao) pontos2++;
-
-    if (carta1.area > carta2.area) pontos1++;
-    else if (carta1.area < carta2.area) pontos2++;
-
-    if (carta1.pib > carta2.pib) pontos1++;
-    else if (carta1.pib < carta2.pib) pontos2++;
-
-    if (carta1.pontosTuristicos > carta2.pontosTuristicos) pontos1++;
-    else if (carta1.pontosTuristicos < carta2.pontosTuristicos) pontos2++;
-
-    printf("\nResultado da comparação:\n");
-    if (pontos1 > pontos2) {
-        printf("%s venceu!\n", carta1.nomeCidade);
-    } else if (pontos2 > pontos1) {
-        printf("%s venceu!\n", carta2.nomeCidade);
-    } else {
-        printf("Empate entre %s e %s!\n", carta1.nomeCidade, carta2.nomeCidade);
+void compararCartasSelecionadas(Carta *cartasSelecionadas, int numCartasSelecionadas) {
+    if (numCartasSelecionadas < 2) {
+        printf("É necessário selecionar pelo menos 2 cartas para comparação!\n");
+        return;
     }
+
+    int pontos[numCartasSelecionadas];
+
+    for (int i = 0; i < numCartasSelecionadas; i++) {
+        pontos[i] = 0;
+    }
+
+    for (int i = 0; i < numCartasSelecionadas; i++) {
+        for (int j = i + 1; j < numCartasSelecionadas; j++) {
+            int pontos1 = 0, pontos2 = 0;
+
+            if (cartasSelecionadas[i].populacao > cartasSelecionadas[j].populacao) pontos1++;
+            else if (cartasSelecionadas[i].populacao < cartasSelecionadas[j].populacao) pontos2++;
+
+            if (cartasSelecionadas[i].area > cartasSelecionadas[j].area) pontos1++;
+            else if (cartasSelecionadas[i].area < cartasSelecionadas[j].area) pontos2++;
+
+            if (cartasSelecionadas[i].pib > cartasSelecionadas[j].pib) pontos1++;
+            else if (cartasSelecionadas[i].pib < cartasSelecionadas[j].pib) pontos2++;
+
+            if (cartasSelecionadas[i].pontosTuristicos > cartasSelecionadas[j].pontosTuristicos) pontos1++;
+            else if (cartasSelecionadas[i].pontosTuristicos < cartasSelecionadas[j].pontosTuristicos) pontos2++;
+
+            if (pontos1 > pontos2) {
+                pontos[i]++;
+            } else if (pontos2 > pontos1) {
+                pontos[j]++;
+            }
+        }
+    }
+
+    int vencedorIndex = 0;
+    for (int i = 1; i < numCartasSelecionadas; i++) {
+        if (pontos[i] > pontos[vencedorIndex]) {
+            vencedorIndex = i;
+        }
+    }
+
+    printf("\nA carta vencedora é: %s\n", cartasSelecionadas[vencedorIndex].nomeCidade);
+    printf("Com %d vitórias!\n", pontos[vencedorIndex]);
 }
 
 void compararTodasAsCartas(Carta *cartas, int totalCartas) {
-    // Zerar pontos de vitória antes de começar a contagem
     for (int i = 0; i < totalCartas; i++) {
         cartas[i].pontosVitoria = 0;
     }
@@ -146,14 +167,13 @@ void compararTodasAsCartas(Carta *cartas, int totalCartas) {
             else if (cartas[i].pontosTuristicos < cartas[j].pontosTuristicos) pontos2++;
 
             if (pontos1 > pontos2) {
-                cartas[i].pontosVitoria++;  // Incrementa a vitória da carta 1
+                cartas[i].pontosVitoria++;
             } else if (pontos2 > pontos1) {
-                cartas[j].pontosVitoria++;  // Incrementa a vitória da carta 2
+                cartas[j].pontosVitoria++;
             }
         }
     }
 
-    // Ordenar as cartas por pontos de vitória (maior para menor)
     for (int i = 0; i < totalCartas - 1; i++) {
         for (int j = i + 1; j < totalCartas; j++) {
             if (cartas[i].pontosVitoria < cartas[j].pontosVitoria) {
@@ -164,7 +184,6 @@ void compararTodasAsCartas(Carta *cartas, int totalCartas) {
         }
     }
 
-    // Exibir pódio
     printf("\nPódio das Cartas:\n");
     printf("1º Lugar: %s (%d vitórias)\n", cartas[0].nomeCidade, cartas[0].pontosVitoria);
     if (totalCartas > 1) {
@@ -183,7 +202,7 @@ int main() {
     do {
         printf("\n1 - Cadastrar nova carta\n");
         printf("2 - Listar cartas\n");
-        printf("3 - Comparar duas cartas\n");
+        printf("3 - Comparar cartas selecionadas\n");
         printf("4 - Comparar todas as cartas e ver o pódio\n");
         printf("5 - Salvar e sair\n");
         printf("Escolha uma opção: ");
@@ -201,17 +220,34 @@ int main() {
             case 2:
                 listarCartas(cartas, totalCartas);
                 break;
-            case 3:
-                if (totalCartas >= 2) {
-                    int indice1, indice2;
-                    listarCartas(cartas, totalCartas);
-                    printf("Escolha o índice das duas cartas para comparar: ");
-                    scanf("%d %d", &indice1, &indice2);
-                    compararCartas(cartas[indice1 - 1], cartas[indice2 - 1]);
-                } else {
-                    printf("É necessário pelo menos 2 cartas!\n");
+            case 3: {
+                int numCartasSelecionadas;
+                printf("Quantas cartas deseja comparar? ");
+                scanf("%d", &numCartasSelecionadas);
+
+                if (numCartasSelecionadas <= 1) {
+                    printf("É necessário selecionar pelo menos 2 cartas para comparação!\n");
+                    break;
                 }
+
+                listarCartas(cartas, totalCartas);
+                Carta cartasSelecionadas[numCartasSelecionadas];
+                printf("Escolha as cartas pelo índice (1 a %d):\n", totalCartas);
+                for (int i = 0; i < numCartasSelecionadas; i++) {
+                    int indice;
+                    printf("Carta %d: ", i + 1);
+                    scanf("%d", &indice);
+                    if (indice >= 1 && indice <= totalCartas) {
+                        cartasSelecionadas[i] = cartas[indice - 1];
+                    } else {
+                        printf("Índice inválido, tente novamente.\n");
+                        i--;
+                    }
+                }
+
+                compararCartasSelecionadas(cartasSelecionadas, numCartasSelecionadas);
                 break;
+            }
             case 4:
                 compararTodasAsCartas(cartas, totalCartas);
                 break;
